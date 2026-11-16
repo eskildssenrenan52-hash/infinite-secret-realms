@@ -206,7 +206,7 @@ export class RealtimeSandboxPersistence {
     await this.ensureUserProfile(user);
 
     const savePath = `users/${user.uid}/sandboxSaves/primary`;
-    const saveRef = doc(db, 'users', user.uid, 'sandboxSaves', 'primary');
+    const saveRef = doc(db, 'users', user.uid, 'sandboxSaves', 'primary_v3');
 
     this.saveUnsub = onSnapshot(
       saveRef,
@@ -323,7 +323,7 @@ export class RealtimeSandboxPersistence {
     this.setStatus('syncing');
 
     const savePath = `users/${currentUser.uid}/sandboxSaves/primary`;
-    const saveRef = doc(db, 'users', currentUser.uid, 'sandboxSaves', 'primary');
+    const saveRef = doc(db, 'users', currentUser.uid, 'sandboxSaves', 'primary_v3');
     const clean = sanitizePayloadForFirestore(payload, currentUser.uid);
 
     try {
