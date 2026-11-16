@@ -49,7 +49,7 @@ import {
 } from './sandboxWorld';
 import { TILE_SIZE } from './types';
 
-test('generateSandboxWorld builds a 2400x460 4-directional Celeste world with 1200 chambers and 24 biomes', () => {
+test('generateSandboxWorld builds a 2880x552 4-directional Celeste world with 1728 chambers and 24 biomes', () => {
   const world = generateSandboxWorld(202504);
 
   assert.equal(SANDBOX_COLS, 2880);
@@ -74,19 +74,19 @@ test('generateSandboxWorld builds a 2400x460 4-directional Celeste world with 12
   const seenBiomes = new Set<string>();
   for (const reg of SANDBOX_SURFACE_REGIONS) {
     const midTx = Math.floor((reg.minTx + reg.maxTx) / 2);
-    seenBiomes.add(getSandboxBiomeAt(midTx, 185).id);
+    seenBiomes.add(getSandboxBiomeAt(Math.floor(midTx * 1.2), 185).id);
   }
   for (const tx of [300, 1200, 2000]) {
-    seenBiomes.add(getSandboxBiomeAt(tx, 50).id);
-    seenBiomes.add(getSandboxBiomeAt(tx, 410).id);
+    seenBiomes.add(getSandboxBiomeAt(tx * 1.2, 50).id);
+    seenBiomes.add(getSandboxBiomeAt(tx * 1.2, 480).id);
   }
   for (const tx of [300, 900, 1600, 2150]) {
-    seenBiomes.add(getSandboxBiomeAt(tx, 300).id);
+    seenBiomes.add(getSandboxBiomeAt(tx * 1.2, 300).id);
   }
   assert.equal(seenBiomes.size, 24);
 
   // Hub chamber sits at (29, 8) with open air around spawn
-  assert.equal(SANDBOX_HUB_SX, 29);
+  assert.equal(SANDBOX_HUB_SX, 35);
   assert.equal(SANDBOX_HUB_SY, 8);
   assert.equal(world.spawnTx, SANDBOX_HUB_SPAWN_TX);
   assert.equal(world.spawnTy, SANDBOX_HUB_SPAWN_TY);
