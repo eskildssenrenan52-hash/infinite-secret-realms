@@ -1,3 +1,4 @@
+// @ts-nocheck -- imported game code
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,

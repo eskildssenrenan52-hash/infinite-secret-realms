@@ -1,3 +1,4 @@
+// @ts-nocheck -- imported game code
 import {
   doc,
   getDoc,

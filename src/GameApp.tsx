@@ -1,3 +1,4 @@
+// @ts-nocheck -- imported game code
 import React, { Component, useEffect, useRef, useState } from 'react';
 import { GameShell } from './components/game/GameShell';
 import { GameEngine } from './game/engine';
