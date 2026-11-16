@@ -28,3 +28,6 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- The game (imported Vite app) lives in src/game, src/components/game and src/GameApp.tsx, loaded client-only via lazy import in src/routes/index.tsx — it uses canvas/window and must never run during SSR.
+- Sandbox chamber variety comes from src/game/sandboxUniqueChambers.ts (seeded per chamber, protects exit corridors) — keep the "every chamber unique" test passing when changing generation.
