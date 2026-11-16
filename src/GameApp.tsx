@@ -71,6 +71,7 @@ export default function App() {
         }}
         onEngineReady={(engine) => {
           engineRef.current = engine;
+          if (import.meta.env.DEV) (window as any).__aethelgardEngine = engine;
         }}
       />
     </AppErrorBoundary>
