@@ -557,6 +557,9 @@ export class GameEngine {
   public sandboxSwingKind: 'tool' | 'weapon' = 'tool';
   private sandboxCrystalCooldown = 0;
   private sandboxSpiritBoltCooldown = 0;
+  public sandboxHp = 10;
+  public sandboxMaxHp = 10;
+  private sandboxRegenTimer = 0;
   private pendingSandboxDelta: SandboxDeltaSave | null = null;
   public sandboxSyncStatus: SyncStatus = 'local';
   public sandboxSyncLastMs: number | null = null;
@@ -7805,7 +7808,7 @@ export class GameEngine {
         } else if (p.invulnTimer <= 0) {
           pr.active = false;
           if (this.playMode === 'sandbox_world') {
-            this.respawnPlayerInSandbox();
+            this.damageSandboxPlayer(2, pr.x);
           } else {
             this.killPlayer();
           }
@@ -8679,6 +8682,50 @@ export class GameEngine {
     return hits;
   }
 
+  /** Sandbox enemies hurt the player: HP loss, knockback, i-frames; death returns to spawn. */
+  public damageSandboxPlayer(amount: number, sourceX: number): void {
+    const p = this.player;
+    if (p.dead || p.invulnTimer > 0 || this.assist.invincible) return;
+    const px = p.x + 4;
+    const py = p.y + 5;
+    if (p.heroShieldReady) {
+      p.heroShieldReady = false;
+      this.aegisRegenTimer = 12.0;
+      p.invulnTimer = 1.0;
+      this.spawnShockwave(px, py, 30, '#ffe066', 0.3);
+      this.spawnFloatingText(p.x, p.y - 12, 'ESCUDO!', '#ffe066');
+      gameAudio.playEnemyHit(true);
+      return;
+    }
+    this.sandboxHp = Math.max(0, this.sandboxHp - amount);
+    this.sandboxRegenTimer = 0;
+    p.invulnTimer = 0.9;
+    const kb = px < sourceX ? -1 : 1;
+    p.vx = kb * 150;
+    p.vy = -120 * (p.gravityDir || 1);
+    this.hitstop = 0.05;
+    this.trauma = Math.max(this.trauma, 0.55);
+    this.damageFlashTimer = 0.28;
+    this.damageFlashColor = '#ff2244';
+    this.hitFlashTimer = 0.16;
+    this.hitFlashColor = '#ff3864';
+    this.hitFlashX = px;
+    this.hitFlashY = py;
+    this.onRumble?.(110, 0.3, 0.6);
+    this.burstParticles(px, py, 14, '#ff3864', 110);
+    this.spawnFloatingText(p.x, p.y - 12, `-${amount}`, '#ff3864');
+    gameAudio.playEnemyHit(true);
+    if (this.sandboxHp <= 0) {
+      this.deaths += 1;
+      const lost = Math.min(this.astralCoins ?? 0, 5);
+      if (lost > 0 && typeof this.astralCoins === 'number') this.astralCoins -= lost;
+      this.sandboxHp = this.sandboxMaxHp;
+      this.spawnFloatingText(p.x, p.y - 22, lost > 0 ? `DERROTADO! -${lost}★` : 'DERROTADO!', '#ff3864');
+      this.respawnPlayerInSandbox();
+    }
+    this.emitHud();
+  }
+
   private respawnPlayerInSandbox(): void {
     const world = this.sandboxWorld;
     if (!world) return;
@@ -8709,6 +8756,7 @@ export class GameEngine {
       return true;
     }
     if (tile === SB_TILE.SHRINE) {
+      this.sandboxHp = this.sandboxMaxHp;
       this.player.dashes = this.player.maxDashes;
       this.player.stamina = this.player.maxStamina;
       this.grantPlayerXp(8);
@@ -8865,6 +8913,11 @@ export class GameEngine {
         } else if (clickedTile === SB_TILE.LIFE_CRYSTAL) {
           this.addAstralCoins(6);
           this.grantPlayerXp(25);
+          if (this.sandboxMaxHp < 30) {
+            this.sandboxMaxHp += 2;
+            this.sandboxHp = this.sandboxMaxHp;
+            this.spawnFloatingText(tx * TILE_SIZE, ty * TILE_SIZE - 20, '+1 CORAÇÃO MÁXIMO!', '#ff3864');
+          }
           this.spawnFloatingText(tx * TILE_SIZE, ty * TILE_SIZE - 10, 'CRISTAL DE VIDA +6★!', '#ff3864');
           this.spawnShockwave(tx * TILE_SIZE + 4, ty * TILE_SIZE + 4, 28, '#ff3864', 0.35);
           gameAudio.playRelic();
@@ -9369,7 +9422,7 @@ export class GameEngine {
 
     // Sky Peaks (sy <= 3) & Deep Underworld (sy >= 16) vertical exploration milestones
     if (curSy <= 3) world.progress.reachedSky = 1;
-    if (curSy >= 16) world.progress.reachedHell = 1;
+    if (curSy >= 18) world.progress.reachedHell = 1;
 
     // Auto-unlock nearby Teleport Pylon when passing near it
     for (const py of world.pylons) {
@@ -9634,7 +9687,7 @@ export class GameEngine {
       const side = Math.random() < 0.5 ? -1 : 1;
       const ex = Math.max(32, Math.min(SANDBOX_WORLD_WIDTH_PX - 32, p.x + side * (115 + Math.random() * 55)));
       const kind =
-        curSy >= 16
+        curSy >= 18
           ? 'hell_imp'
           : curSy >= 11
             ? 'cave_skeleton'
@@ -9677,8 +9730,8 @@ export class GameEngine {
         y: Math.max(24, p.y - 24),
         vx: 0,
         vy: 0,
-        hp: kind === 'slime' ? 2 : curSy >= 16 ? 5 : 3,
-        maxHp: kind === 'slime' ? 2 : curSy >= 16 ? 5 : 3,
+        hp: kind === 'slime' ? 2 : curSy >= 18 ? 5 : 3,
+        maxHp: kind === 'slime' ? 2 : curSy >= 18 ? 5 : 3,
         w: 12,
         h: 11,
         color: kind === 'hell_imp' ? '#ff5522' : kind === 'demon_eye' ? '#e11d48' : kind === 'cave_skeleton' ? '#e2e8f0' : '#4df0c0',
@@ -9739,10 +9792,24 @@ export class GameEngine {
         }
       }
       // Player stomp or dash hits sandbox enemy!
-      if (Math.abs(p.x - foe.x) < 13 && Math.abs(p.y - foe.y) < 13 && (p.dashTimer > 0 || p.vy > 30)) {
+      const touching = Math.abs(p.x + 4 - (foe.x + foe.w * 0.5)) < (foe.w * 0.5 + 4) && Math.abs(p.y + 5 - (foe.y + foe.h * 0.5)) < (foe.h * 0.5 + 5);
+      const stomping = p.vy > 30 && p.y + 6 < foe.y + foe.h * 0.5;
+      if (touching && (p.dashTimer > 0 || stomping)) {
         const dmg = 1 + Math.floor(heroStats.totalAttackBonus * 0.5);
         this.damageSandboxEnemy(foe, dmg);
         p.vy = -140;
+      } else if (touching && foe.hp > 0) {
+        const contactDmg = foe.isBoss ? 3 : foe.kind === 'slime' ? 1 : 2;
+        this.damageSandboxPlayer(contactDmg, foe.x + foe.w * 0.5);
+      }
+    }
+
+    // Slow out-of-combat regeneration (faster next to a campfire)
+    if (this.sandboxHp < this.sandboxMaxHp && !p.dead) {
+      this.sandboxRegenTimer += simDt * (footTile === SB_TILE.CAMPFIRE ? 6 : 1);
+      if (this.sandboxRegenTimer >= 7) {
+        this.sandboxRegenTimer = 0;
+        this.sandboxHp = Math.min(this.sandboxMaxHp, this.sandboxHp + 1);
       }
     }
 
@@ -10055,6 +10122,8 @@ export class GameEngine {
         ? SANDBOX_QUESTS.filter((q) => this.getSandboxQuestProgress(q.id) >= q.target).length
         : 0,
       sandboxQuestsTotal: SANDBOX_QUESTS.length,
+      sandboxHp: this.sandboxHp,
+      sandboxMaxHp: this.sandboxMaxHp,
       sandboxBossActive: Boolean(this.sandboxWorld?.enemies.some((e) => e.isBoss && e.hp > 0)),
       sandboxExplorationPct: this.sandboxWorld ? getSandboxExplorationPct(this.sandboxWorld.exploredSectors) : 0,
       sandboxWorldCols: SANDBOX_COLS,

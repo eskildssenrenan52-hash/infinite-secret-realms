@@ -1010,6 +1010,8 @@ export interface HudSnapshot {
   sandboxQuestsCompleted: number;
   sandboxQuestsTotal: number;
   sandboxBossActive: boolean;
+  sandboxHp: number;
+  sandboxMaxHp: number;
   sandboxExplorationPct: number;
   sandboxWorldCols: number;
   sandboxWorldRows: number;

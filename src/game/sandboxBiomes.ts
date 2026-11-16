@@ -6,8 +6,8 @@ export const SANDBOX_SECTOR_W = ROOM_COLS; // 40
 export const SANDBOX_SECTOR_H = ROOM_ROWS; // 23
 export const SANDBOX_SECTOR_WIDTH = SANDBOX_SECTOR_W;
 export const SANDBOX_SECTOR_HEIGHT = SANDBOX_SECTOR_H;
-export const SANDBOX_SECTOR_COLS = 60;
-export const SANDBOX_SECTOR_ROWS = 20;
+export const SANDBOX_SECTOR_COLS = 72;
+export const SANDBOX_SECTOR_ROWS = 24;
 export const SANDBOX_COLS = SANDBOX_SECTOR_COLS * SANDBOX_SECTOR_W; // 2400
 export const SANDBOX_ROWS = SANDBOX_SECTOR_ROWS * SANDBOX_SECTOR_H; // 460
 export const SANDBOX_SECTOR_TILE_SIZE = SANDBOX_SECTOR_W; // 40 (horizontal reference)
@@ -234,6 +234,9 @@ export interface SandboxBiomeInfo {
   dangerTier: number;
 }
 
+export const SANDBOX_CAVERN_SY = 11;
+export const SANDBOX_UNDERWORLD_SY = 18;
+
 export function getSandboxSurfaceRegion(tx: number): SandboxRegionDef {
   const cx = Math.max(0, Math.min(SANDBOX_COLS - 1, tx));
   for (let i = 0; i < SANDBOX_SURFACE_REGIONS.length; i++) {
@@ -250,7 +253,8 @@ export function getSandboxSectorCoords(tx: number, ty: number): { sx: number; sy
 }
 
 export function getSandboxBiomeAt(tx: number, ty: number): SandboxBiomeInfo {
-  const cx = Math.max(0, Math.min(SANDBOX_COLS - 1, Math.floor(tx)));
+  // Biome bands were authored for a 2400-tile-wide world; scale so the bigger map keeps the same layout.
+  const cx = Math.floor((Math.max(0, Math.min(SANDBOX_COLS - 1, Math.floor(tx))) * 2400) / SANDBOX_COLS);
   const cy = Math.max(0, Math.min(SANDBOX_ROWS - 1, Math.floor(ty)));
   const sy = Math.floor(cy / SANDBOX_SECTOR_H);
 
@@ -290,7 +294,7 @@ export function getSandboxBiomeAt(tx: number, ty: number): SandboxBiomeInfo {
   }
 
   // Stratum 4: Deep Underworld & Magma Core (sy 16..19 => ty 368..459)
-  if (sy >= 16) {
+  if (sy >= SANDBOX_UNDERWORLD_SY) {
     if (cx < 800) {
       return {
         id: 'underworld',
@@ -325,7 +329,7 @@ export function getSandboxBiomeAt(tx: number, ty: number): SandboxBiomeInfo {
   }
 
   // Stratum 3: Subterranean Geodes & Ruins (sy 11..15 => ty 253..367)
-  if (sy >= 11) {
+  if (sy >= SANDBOX_CAVERN_SY) {
     if (cx < 600) {
       return {
         id: 'sunken_cathedral',
@@ -397,8 +401,8 @@ export function getSandboxCampaignBiomeAt(tx: number, ty: number): AnyBiomeId {
 
 /** Nominal platform floor height inside a horizon chamber (for hub/landmarks alignment). */
 export function getSandboxSurfaceHeightAt(tx: number, seed = 202504): number {
-  const hubMin = 1080;
-  const hubMax = 1280;
+  const hubMin = 1360;
+  const hubMax = 1560;
   if (tx >= hubMin && tx <= hubMax) {
     // Center Horizon Chamber (sy=8 => ty 184..206): ground sits cleanly at ty=201
     return 201;

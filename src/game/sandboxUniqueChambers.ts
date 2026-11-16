@@ -206,7 +206,7 @@ export function decorateUniqueChamber(c: UniqueChamberCtx): number {
   // 4) Decor props & a random celeste gimmick
   for (let k = 0; k < ri(1, 3); k++) c.addProp(pick(PROPS), ox + ri(3, CW - 4), oy + ri(4, 12), ri(4, 8));
   if (rnd() < 0.45) {
-    const g = pick(['dash_crystal', 'boost_hoop', 'spring_up', 'grapple_anchor', 'feather', 'bumper']);
+    const g = pick(['dash_crystal', 'boost_hoop', 'spring_up', 'grapple_anchor', 'feather_aura', 'bumper_orb', 'astral_coin', 'star_shard', 'jump_orb']);
     const gx = ox2 + ri(1, 8), gy = ri(3, 12);
     if (get(gx, gy) === SB_TILE.AIR) c.addEntity(g, ox + gx, oy + gy);
   }

@@ -26,6 +26,7 @@ import {
   TILE_SIZE,
   TileType,
 } from './types';
+import { decorateUniqueChamber } from './sandboxUniqueChambers';
 
 export {
   SANDBOX_BIOMES,
@@ -50,7 +51,7 @@ export const SANDBOX_WORLD_WIDTH_PX = SANDBOX_COLS * TILE_SIZE;
 export const SANDBOX_WORLD_HEIGHT_PX = SANDBOX_ROWS * TILE_SIZE;
 
 // Hub chamber coordinates: central Forest sanctuary ("Vale de Aethelgard")
-export const SANDBOX_HUB_SX = 29;
+export const SANDBOX_HUB_SX = 35;
 export const SANDBOX_HUB_SY = 8;
 export const SANDBOX_HUB_SPAWN_TX = SANDBOX_HUB_SX * SANDBOX_SECTOR_WIDTH + 10; // 1170
 export const SANDBOX_HUB_SPAWN_TY = SANDBOX_HUB_SY * SANDBOX_SECTOR_HEIGHT + 14; // 198
@@ -1017,6 +1018,12 @@ export function generateSandboxWorld(seed = 202504): SandboxWorld {
           h: 6,
         });
       }
+      decorateUniqueChamber({
+        tiles, walls, cols, rows, ox, oy, sx, sy, seed, CW, CH,
+        solidTile, oreTile, stratum,
+        addEntity: (kind, tx, ty, extra) => celesteEntities.push(makeEntity(`sb_c_${entSeq++}`, kind, tx, ty, extra)),
+        addProp: (kind, tx, ty, h) => scenicProps.push({ id: `sb_p_${propSeq++}`, kind, tx, ty, h }),
+      });
     }
   }
 
