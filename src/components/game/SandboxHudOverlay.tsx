@@ -58,6 +58,22 @@ export const SandboxHudOverlay: React.FC<SandboxHudOverlayProps> = ({
       data-testid="sandbox-hud-overlay"
       className="fixed inset-0 z-20 pointer-events-none"
     >
+      {/* Player hearts (each heart = 2 HP) */}
+      <div
+        data-testid="sandbox-hearts"
+        className="absolute left-1/2 top-9 -translate-x-1/2 flex items-center gap-0.5 border-2 border-[#07050d] bg-[#100c1bf0] px-1.5 py-0.5"
+        title={`Vida ${hud.sandboxHp ?? 10}/${hud.sandboxMaxHp ?? 10}`}
+      >
+        {Array.from({ length: Math.ceil((hud.sandboxMaxHp ?? 10) / 2) }).map((_, i) => {
+          const hp = hud.sandboxHp ?? 10;
+          const fill = Math.max(0, Math.min(2, hp - i * 2));
+          return (
+            <span key={i} className="font-pixel text-[12px] leading-none" style={{ color: fill === 2 ? '#ff3864' : fill === 1 ? '#ff8fa8' : '#3a2d52' }}>
+              {fill === 1 ? '♡' : '♥'}
+            </span>
+          );
+        })}
+      </div>
       {/* Top-Center Sandbox Environment Bar (compact single row clear of Left Hero HUD & Right Pause) */}
       <div className="absolute left-1/2 top-2 -translate-x-1/2 flex max-w-[calc(100vw-240px)] items-center justify-center gap-1 pointer-events-auto whitespace-nowrap">
         <div className="flex items-center gap-1.5 border-2 border-[#07050d] bg-[#100c1bf0] px-2 py-0.5 shadow-[0_2px_0_0_#07050d]">

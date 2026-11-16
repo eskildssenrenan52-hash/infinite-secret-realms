@@ -247,7 +247,7 @@ export const SandboxWorldMapModal: React.FC<SandboxWorldMapModalProps> = ({
     >
       <PixelWindow
         title="Atlas do Mundo Aberto Celeste"
-        subtitle={`${SANDBOX_COLS}×${SANDBOX_ROWS} blocos · 1.200 Câmaras · Biomas ${hud.sandboxDiscoveredBiomesCount}/24 · ${hud.sandboxExplorationPct}% Explorado`}
+        subtitle={`${SANDBOX_COLS}×${SANDBOX_ROWS} blocos · ${(SANDBOX_SECTOR_COLS * SANDBOX_SECTOR_ROWS).toLocaleString('pt-BR')} Câmaras · Biomas ${hud.sandboxDiscoveredBiomesCount}/24 · ${hud.sandboxExplorationPct}% Explorado`}
         accentColor="#4df0c0"
         onClose={onClose}
         closeLabel="Fechar Atlas Mundial"

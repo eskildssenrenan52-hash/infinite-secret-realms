@@ -43,7 +43,7 @@ export interface SandboxCloudPayload {
   clientUpdatedAtMs: number;
 }
 
-const LOCAL_EXPLORATION_KEY = 'aethelgard_sandbox_realtime_v2';
+const LOCAL_EXPLORATION_KEY = 'aethelgard_sandbox_realtime_v3';
 
 export function loadLocalSandboxSave(): SandboxCloudPayload | null {
   if (typeof window === 'undefined') return null;

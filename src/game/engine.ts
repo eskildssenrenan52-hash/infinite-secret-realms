@@ -913,6 +913,7 @@ export class GameEngine {
         });
       }
       if (typeof data.astralCoins === 'number') this.astralCoins = data.astralCoins;
+      if (typeof data.sandboxMaxHp === 'number') { this.sandboxMaxHp = Math.max(10, Math.min(30, data.sandboxMaxHp)); this.sandboxHp = this.sandboxMaxHp; }
       if (typeof data.styleScore === 'number') this.styleScore = data.styleScore;
       if (typeof data.bestSurvivalWave === 'number') this.bestSurvivalWave = data.bestSurvivalWave;
       if (typeof data.bestBossRushSeconds === 'number') this.bestBossRushSeconds = data.bestBossRushSeconds;
@@ -1150,6 +1151,7 @@ export class GameEngine {
           deaths: this.deaths,
           elapsedSeconds: this.elapsedSeconds,
           astralCoins: this.astralCoins,
+          sandboxMaxHp: this.sandboxMaxHp,
           blessings: this.blessings,
           collectedCoins: Array.from(this.collectedCoins),
           visitedRooms: Array.from(this.visitedRooms),
