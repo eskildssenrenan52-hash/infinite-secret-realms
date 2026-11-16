@@ -1127,8 +1127,8 @@ export class GameEngine {
           if (typeof id === 'string') this.sandboxQuestsClaimed.add(id);
         });
       }
-      if (data.sandboxDelta && typeof data.sandboxDelta === 'object') {
-        this.pendingSandboxDelta = data.sandboxDelta as SandboxDeltaSave;
+      if (data.sandboxDeltaV3 && typeof data.sandboxDeltaV3 === 'object') {
+        this.pendingSandboxDelta = data.sandboxDeltaV3 as SandboxDeltaSave;
       }
       this.unlockMechanic('AUTO_SAVE');
     } catch {
@@ -1221,7 +1221,7 @@ export class GameEngine {
           sandboxToolTier: this.sandboxToolTier,
           sandboxBackpack: this.sandboxBackpack,
           sandboxQuestsClaimed: Array.from(this.sandboxQuestsClaimed),
-          sandboxDelta: this.sandboxWorld ? exportSandboxDelta(this.sandboxWorld) : this.pendingSandboxDelta,
+          sandboxDeltaV3: this.sandboxWorld ? exportSandboxDelta(this.sandboxWorld) : this.pendingSandboxDelta,
         })
       );
     } catch {
