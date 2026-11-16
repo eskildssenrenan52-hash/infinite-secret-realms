@@ -1,3 +1,4 @@
+// @ts-nocheck -- imported game code
 // Studio-Grade 4x Supersampled Hero Character & Portrait Art Renderer
 // Elevates all 48 heroes (36 classic + 12 new) with distinct silhouettes, bespoke weapons,
 // layered armor/robes, expressive anime/Celeste eyes, specular rim-lighting, and flowing capes.
