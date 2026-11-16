@@ -52,16 +52,16 @@ import { TILE_SIZE } from './types';
 test('generateSandboxWorld builds a 2400x460 4-directional Celeste world with 1200 chambers and 24 biomes', () => {
   const world = generateSandboxWorld(202504);
 
-  assert.equal(SANDBOX_COLS, 2400);
-  assert.equal(SANDBOX_ROWS, 460);
-  assert.equal(SANDBOX_SECTOR_COLS, 60);
-  assert.equal(SANDBOX_SECTOR_ROWS, 20);
+  assert.equal(SANDBOX_COLS, 2880);
+  assert.equal(SANDBOX_ROWS, 552);
+  assert.equal(SANDBOX_SECTOR_COLS, 72);
+  assert.equal(SANDBOX_SECTOR_ROWS, 24);
   assert.equal(SANDBOX_SECTOR_WIDTH, 40);
   assert.equal(SANDBOX_SECTOR_HEIGHT, 23);
-  assert.equal(SANDBOX_TOTAL_SECTORS, 1200);
+  assert.equal(SANDBOX_TOTAL_SECTORS, 1728);
 
-  assert.equal(world.cols, 2400);
-  assert.equal(world.rows, 460);
+  assert.equal(world.cols, 2880);
+  assert.equal(world.rows, 552);
   assert.equal(world.tiles.length, SANDBOX_COLS * SANDBOX_ROWS);
   assert.equal(world.walls.length, SANDBOX_COLS * SANDBOX_ROWS);
   assert.equal(world.exploredSectors.length, SANDBOX_TOTAL_SECTORS);
@@ -302,4 +302,23 @@ test('48 studio-grade heroes and expanded crafting recipes are complete', () => 
     assert.equal(hero.skins.length, 3, `Expected 3 skins for ${hero.id}`);
   }
   assert.ok(CRAFT_RECIPES.length >= 60, `Expected >= 60 crafting recipes, got ${CRAFT_RECIPES.length}`);
+});
+
+test('every chamber layout is unique (no repeated rooms) and secrets exist', () => {
+  const world = generateSandboxWorld(202504);
+  const seen = new Set<string>();
+  let secretWalls = 0;
+  for (let sy = 0; sy < SANDBOX_SECTOR_ROWS; sy++) {
+    for (let sx = 0; sx < SANDBOX_SECTOR_COLS; sx++) {
+      let sig = '';
+      for (let ly = 0; ly < SANDBOX_SECTOR_H; ly++) {
+        const row = (sy * SANDBOX_SECTOR_H + ly) * world.cols + sx * SANDBOX_SECTOR_W;
+        sig += Array.from(world.tiles.subarray(row, row + SANDBOX_SECTOR_W)).join(',') + '|';
+      }
+      seen.add(sig);
+    }
+  }
+  for (let i = 0; i < world.tiles.length; i++) if (world.tiles[i] === SB_TILE.SECRET_WALL) secretWalls++;
+  assert.equal(seen.size, SANDBOX_TOTAL_SECTORS);
+  assert.ok(secretWalls > 300, `expected many secret walls, got ${secretWalls}`);
 });

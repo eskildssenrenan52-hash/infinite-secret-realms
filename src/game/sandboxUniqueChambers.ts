@@ -17,13 +17,13 @@ function rngFrom(a: number, b: number, seed: number) {
   };
 }
 
-const ACCENTS: Record<string, number[]> = {
+const getAccents = (): Record<string, number[]> => ({
   sky: [SB_TILE.CLOUD_BOUNCE, SB_TILE.GLASS, SB_TILE.CARVED_STONE, SB_TILE.ICE],
   overworld: [SB_TILE.DIRT, SB_TILE.GRASS, SB_TILE.STONE, SB_TILE.WOOD_TRUNK, SB_TILE.MUD, SB_TILE.SAND, SB_TILE.BRICK_BLOCK],
   caverns: [SB_TILE.STONE, SB_TILE.CARVED_STONE, SB_TILE.DUNGEON_BRICK, SB_TILE.MUD, SB_TILE.ICE],
   underworld: [SB_TILE.ASH, SB_TILE.HELLSTONE, SB_TILE.OBSIDIAN, SB_TILE.MAGMA_CRUST, SB_TILE.NEON_BRICK],
-};
-const WALL_SET = [SB_WALL.DIRT_WALL, SB_WALL.STONE_WALL, SB_WALL.BRICK_WALL, SB_WALL.DUNGEON_WALL, SB_WALL.SAKURA_WALL, SB_WALL.NEON_WALL, SB_WALL.WOOD_WALL, SB_WALL.GLASS_WALL];
+});
+const getWallSet = () => [SB_WALL.DIRT_WALL, SB_WALL.STONE_WALL, SB_WALL.BRICK_WALL, SB_WALL.DUNGEON_WALL, SB_WALL.SAKURA_WALL, SB_WALL.NEON_WALL, SB_WALL.WOOD_WALL, SB_WALL.GLASS_WALL];
 const PROPS = ['pillar', 'arch', 'banner', 'lantern', 'chain', 'statue', 'crystal_cluster', 'tree_pine', 'shroom_giant', 'brazier', 'ruin_tower', 'crystal_spire', 'hanging_vine', 'obelisk', 'torii_gate', 'sakura_tree', 'paper_lantern', 'coral_fan', 'kelp_strand', 'clock_gear', 'pendulum', 'wind_chime', 'sun_dial', 'waterfall', 'bird_perch'];
 
 export interface UniqueChamberCtx {
@@ -69,14 +69,14 @@ export function decorateUniqueChamber(c: UniqueChamberCtx): number {
     if (lx < 1 || lx > CW - 2 || ly < 1 || ly > CH - 3 || isProtected(lx, ly)) return;
     tiles[idx(lx, ly)] = t;
   };
-  const accent = pick(ACCENTS[stratum] ?? ACCENTS.overworld);
+  const accent = pick(getAccents()[stratum] ?? getAccents().overworld);
   const side = rnd() < 0.5 ? 0 : 1; // which half the set piece lives in
   const bx = side === 0 ? ri(2, 6) : ri(26, 29);
 
   // 1) Background wall mural — unique tint/shape per chamber
   if (rnd() < 0.7) {
     const w = ri(4, 11), h = ri(3, 8), x0 = ri(2, CW - w - 2), y0 = ri(2, CH - h - 4);
-    const wall = pick(WALL_SET);
+    const wall = pick(getWallSet());
     const shape = ri(0, 2);
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
       if (shape === 1 && (x + y) % 2) continue; // checker
