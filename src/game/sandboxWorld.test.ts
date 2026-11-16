@@ -1,6 +1,6 @@
 // @ts-nocheck -- test suite
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { test } from 'vitest';
 import { CRAFT_RECIPES } from './crafting';
 import { HERO_VISUAL_PROFILES } from './heroArtRenderer';
 import { HEROES } from './heroes';
